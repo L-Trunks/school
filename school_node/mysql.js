@@ -7,7 +7,7 @@ export class _mysql {
             host: 'localhost',
             user: 'root',  //用户名
             password: '',   //密码
-            database: 'mall',
+            database: 'school',
             port: '3306'     //端口号
         });
 
