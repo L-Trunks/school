@@ -704,14 +704,15 @@ app.get('/api/school/course/select_report_by_paper', function (req, res, next) {
 //图片上传
 app.post('/api/school/upload', upload.any(), (req, res) => {
    //读取文件路径
-   fs.readFile(req.file.path, (err, data) => {
+   console.log(req)
+   fs.readFile(req.files[0].path, (err, data) => {
       //如果读取失败
       if (err) { return res.send('上传失败') }
       //如果读取成功
       //声明名字为时间戳和随机数拼接成的，尽量确保唯一性
       let time = Date.now() + parseInt(Math.random() * 999) + parseInt(Math.random() * 2222);
       //拓展名
-      let extname = req.file.mimetype.split('/')[1]
+      let extname = req.files[0].mimetype.split('/')[1]
       //拼接成名字
       let keepname = time + '.' + extname
       //三个参数

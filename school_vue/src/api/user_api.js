@@ -18,7 +18,7 @@ export const TeacherLogin = (params) => {
  * 管理员登录
  */
 export const AdminLogin = (params) => {
-    return get('/user/admin_login', params)
+    return post('/user/admin_login', params)
 }
 
 /**

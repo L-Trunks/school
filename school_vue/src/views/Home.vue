@@ -52,7 +52,12 @@
       </el-form-item>
       <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
-        <el-button type="success" style="width:100%;" @click="login" :loading="logining">登录</el-button>
+        <el-button
+          type="success"
+          style="width:100%;"
+          @click="login('loginData')"
+          :loading="logining"
+        >登录</el-button>
       </el-form-item>
       <el-button size="mini" type="info" @click="isRegister = true" class="remember">立即注册</el-button>
       <div class="background">
@@ -134,7 +139,12 @@
       </el-form-item>
       <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
-        <el-button type="success" style="width:100%;" @click="register" :loading="logining">注册</el-button>
+        <el-button
+          type="success"
+          style="width:100%;"
+          @click="register('registerData')"
+          :loading="logining"
+        >注册</el-button>
       </el-form-item>
       <el-button size="mini" type="info" @click="isRegister = false" class="remember">立即登录</el-button>
       <div class="background">
@@ -290,7 +300,7 @@ export default {
   },
   methods: {
     ...mapMutations(["changeUserId", "changeLoginState", "changeUserInfo"]),
-    ...mapActions(["selectUserById"]),
+    ...mapActions(["selectUserById", "selectAllCourse", "selectAllSort"]),
     //初始化表单数据
     initForm() {
       this.loginData = {
@@ -311,133 +321,161 @@ export default {
       };
     },
     //登录
-    login() {
-      switch (this.loginValue) {
-        case "0":
-          StudentLogin({ params: this.loginData })
-            .then(res => {
-              console.log(res);
-              if (res && res.data.length > 0) {
-                this.changeUserInfo(res.data);
-                this.changeUserId(res.data[0].user_id);
-                this.changeLoginState(true);
-                this.$message.success("登录成功");
-                this.$router.push('/index')
-              } else {
-                this.$message.error("登录失败");
-                return;
-              }
-            })
-            .catch(err => {
-              console.log(err);
-              this.$message.error("服务器跑丢了");
-            });
-          break;
-        case "1":
-          TeacherLogin({ params: this.loginData })
-            .then(res => {
-              console.log(res);
-              if (res && res.data.length > 0) {
-                this.changeUserInfo(res.data);
-                this.changeUserId(res.data[0].user_id);
-                this.changeLoginState(true);
-                this.$message.success("登录成功");
-                this.$router.push('/index')
-              } else {
-                this.$message.error("登录失败");
-                return;
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
-          break;
-        case "2":
-          AdminLogin({ params: this.loginData })
-            .then(res => {
-              console.log(res);
-              if (res && res.data.length > 0) {
-                this.changeUserInfo(res.data);
-                this.changeUserId(res.data[0].user_id);
-                this.changeLoginState(true);
-                this.$message.success("登录成功");
-                this.$router.push('/index')
-              } else {
-                this.$message.error("登录失败");
-                return;
-              }
-            })
-            .catch(err => {
-              console.log(err);
-              this.$message.error("服务器跑丢了");
-            });
-          break;
-      }
+    login(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          switch (this.loginValue) {
+            case "0":
+              StudentLogin({ params: this.loginData })
+                .then(res => {
+                  console.log(res);
+                  if (res && res.data.length > 0) {
+                    this.changeUserInfo(res.data);
+                    this.changeUserId(res.data[0].id);
+                    this.changeLoginState(true);
+                    this.$message.success("登录成功");
+                    this.selectAllCourse();
+                    this.selectAllSort();
+                    this.$router.push("/index");
+                  } else {
+                    this.$message.error("登录失败");
+                    return;
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                  this.$message.error("服务器跑丢了");
+                });
+              break;
+            case "1":
+              TeacherLogin({ params: this.loginData })
+                .then(res => {
+                  console.log(res);
+                  if (res && res.data.length > 0) {
+                    this.changeUserInfo(res.data);
+                    this.changeUserId(res.data[0].id);
+                    this.changeLoginState(true);
+                    this.$message.success("登录成功");
+                    this.selectAllCourse();
+                    this.selectAllSort();
+                    this.$router.push("/index");
+                  } else {
+                    this.$message.error("登录失败");
+                    return;
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+              break;
+            case "2":
+              AdminLogin({ params: this.loginData })
+                .then(res => {
+                  console.log(res);
+                  if (res && res.data.length > 0) {
+                    this.changeUserInfo(res.data);
+                    this.changeUserId(res.data[0].id);
+                    this.changeLoginState(true);
+                    this.$message.success("登录成功");
+                    this.selectAllCourse();
+                    this.selectAllSort();
+                    this.$router.push("/index");
+                  } else {
+                    this.$message.error("登录失败");
+                    return;
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                  this.$message.error("服务器跑丢了");
+                });
+              break;
+          }
+        }else {
+          return false;
+        }
+      });
     },
     //注册
     register() {
-      switch (this.loginValue) {
-        case "0":
-          StudentRegister({ params: this.registerData })
-            .then(res => {
-              console.log(res);
-              if (res.data && res.data.insertId) {
-                this.selectUserById(res.data.insertId);
-                this.changeUserId(res.data.insertId);
-                this.changeLoginState(true);
-                this.$message.success('注册成功,已自动登录')
-                this.$router.push('/index')
-              } else {
-                this.$message.error("注册失败，请检查输入格式");
-                return;
-              }
-            })
-            .catch(err => {
-              console.log(err);
-              this.$message.error("服务器跑丢了");
-            });
-          break;
-        case "1":
-          TeacherRegister({ params: { ...this.registerData, permission: "1" } })
-            .then(res => {
-              console.log(res);
-              if (res.data && res.data.insertId) {
-                this.selectUserById(res.data.insertId);
-                this.changeUserId(res.data.insertId);
-                this.changeLoginState(true);
-                this.$message.success('注册成功,已自动登录')
-                this.$router.push('/index')
-              } else {
-                this.$message.error("注册失败，请检查输入格式");
-                return;
-              }
-            })
-            .catch(err => {
-              console.log(err);
-              this.$message.error("服务器跑丢了");
-            });
-          break;
-        case "2":
-          TeacherRegister({ params: { ...this.registerData, permission: "2" } })
-            .then(res => {
-              console.log(res);
-              if (res.data && res.data.insertId) {
-                this.selectUserById(res.data.insertId);
-                this.changeUserId(res.data.insertId);
-                this.changeLoginState(true);
-                this.$message.success('注册成功,已自动登录')
-                this.$router.push('/index')
-              } else {
-                this.$message.error("注册失败，请检查输入格式");
-                return;
-              }
-            })
-            .catch(err => {
-              console.log(err);
-              this.$message.error("服务器跑丢了");
-            });
-          break;
-      }
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          switch (this.registerValue) {
+            case "0":
+              StudentRegister({ params: this.registerData })
+                .then(res => {
+                  console.log(res);
+                  if (res.data && res.data.insertId) {
+                    this.selectUserById(res.data.insertId);
+                    this.changeUserId(res.data.insertId);
+                    this.changeLoginState(true);
+                    this.$message.success("注册成功,已自动登录");
+                    this.selectAllCourse();
+                    this.selectAllSort();
+                    this.$router.push("/index");
+                  } else {
+                    this.$message.error("注册失败，请检查输入格式");
+                    return;
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                  this.$message.error("服务器跑丢了");
+                });
+              break;
+            case "1":
+              TeacherRegister({
+                params: { ...this.registerData, permission: "1" }
+              })
+                .then(res => {
+                  console.log(res);
+                  if (res.data && res.data.insertId) {
+                    this.selectUserById(res.data.insertId);
+                    this.changeUserId(res.data.insertId);
+                    this.changeLoginState(true);
+                    this.selectAllCourse();
+                    this.selectAllSort();
+                    this.$message.success("注册成功,已自动登录");
+                    this.$router.push("/index");
+                  } else {
+                    this.$message.error("注册失败，请检查输入格式");
+                    return;
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                  this.$message.error("服务器跑丢了");
+                });
+              break;
+            case "2":
+              TeacherRegister({
+                params: { ...this.registerData, permission: "2" }
+              })
+                .then(res => {
+                  console.log(res);
+                  if (res.data && res.data.insertId) {
+                    this.selectUserById(res.data.insertId);
+                    this.changeUserId(res.data.insertId);
+                    this.changeLoginState(true);
+                    this.selectAllCourse();
+                    this.selectAllSort();
+                    this.$message.success("注册成功,已自动登录");
+                    this.$router.push("/index");
+                  } else {
+                    this.$message.error("注册失败，请检查输入格式");
+                    return;
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                  this.$message.error("服务器跑丢了");
+                });
+              break;
+          }
+        }else {
+          return false;
+        }
+      });
     }
   },
   computed: {
@@ -446,6 +484,26 @@ export default {
       userId: state => state.userId,
       userInfo: state => state.userInfo
     })
+  },
+  watch: {
+    userId: {
+      handler(val) {
+        console.log(val);
+        if (!val) {
+          this.changeLoginState(false);
+        }
+      },
+      deep: true
+    },
+    loginState: {
+      handler(val) {
+        console.log(val);
+        if (!val) {
+          this.$router.push("/");
+          this.$message.error("请登录");
+        }
+      }
+    }
   },
   components: {}
 };
