@@ -60,6 +60,12 @@ export const StudentAddCourse = (params) => {
 }
 
 /**
+ * 根据学生查询课程id
+ */
+export const SelectCourseIdByStudent = (params) => {
+    return post('/course/select_course_id_by_student', params)
+}
+/**
  * 查询所有题库
  */
 export const SelectQllQuestion = (params) => {
@@ -168,11 +174,18 @@ export const AddPaper = (params) => {
 export const UpdatePaper = (params) => {
     return post('/course/update_paper', params)
 }
+
 /**
  * 删除试卷
  */
 export const DeletePaper = (params) => {
     return post('/course/delete_paper', params)
+}
+/**
+ * 添加考试记录
+ */
+export const AddReport = (params) => {
+    return post('/course/add_report', params)
 }
 /**
  * 查询所有考试记录

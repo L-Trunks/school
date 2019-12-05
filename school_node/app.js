@@ -340,7 +340,24 @@ app.post('/api/school/course/select_all_question', function (req, res, next) {
       mysql.close()
    })
 })
+//根据学生查询课程id
 
+app.post('/api/school/course/select_course_id_by_student', function (req, res, next) {
+   let getdata = req.body.params
+   let mysql = new _mysql(getdata)
+   mysql.selectCourseIdByStudent(function (error, data, fields) {
+      if (error) {
+         res.json({ res: 1, message: '请求成功' })
+         next(error);
+      } else {
+         let date = new Date()
+         console.log("log:" + "请求成功------" + date + '\n');
+         res.status(200)
+         res.json({ res: 0, message: '请求成功', data: data })
+      }
+      mysql.close()
+   })
+})
 //根据课程查询题库
 app.post('/api/school/course/select_all_question_by_course', function (req, res, next) {
    let getdata = req.body.params
@@ -646,7 +663,24 @@ app.post('/api/school/course/delete_paper', function (req, res, next) {
       mysql.close()
    })
 })
+//添加考试记录
 
+app.post('/api/school/course/add_report', function (req, res, next) {
+   let getdata = req.body.params
+   let mysql = new _mysql(getdata)
+   mysql.addReport(function (error, data, fields) {
+      if (error) {
+         res.json({ res: 1, message: '请求成功' })
+         next(error);
+      } else {
+         let date = new Date()
+         console.log("log:" + "请求成功------" + date + '\n');
+         res.status(200)
+         res.json({ res: 0, message: '请求成功', data: data })
+      }
+      mysql.close()
+   })
+})
 //查询所有考试记录
 app.post('/api/school/course/select_all_report', function (req, res, next) {
    // let getdata = req.body.params

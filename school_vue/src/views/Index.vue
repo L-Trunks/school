@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div :loading="loading">
     <el-row>
       <el-col class="index_header" :span="24">高校课程管理系统</el-col>
     </el-row>
-    <el-row :gutter="20">
+    <el-row class="index_left" :gutter="20">
       <el-col style="margin-top:-20px" :span="4">
         <span class="el-icon-menu menu" @click="isCollapse ? isCollapse = false:isCollapse = true"></span>
         <el-menu :collapse="isCollapse" default-active="0" class="el-menu-vertical-demo">
@@ -13,36 +13,40 @@
               <span slot="title">主页</span>
             </el-menu-item>
           </router-link>
-          <router-link to="/index/course">
-            <el-menu-item index="2">
-              <i class="el-icon-mobile"></i>
-              <span slot="title">课程管理</span>
-            </el-menu-item>
-          </router-link>
-          <router-link to="/index/homework">
-            <el-menu-item index="3">
-              <i class="el-icon-document"></i>
-              <span slot="title">作业＆考试管理</span>
-            </el-menu-item>
-          </router-link>
-          <router-link to="/index/report">
-            <el-menu-item index="4">
-              <i class="el-icon-star-off"></i>
-              <span slot="title">评分管理</span>
-            </el-menu-item>
-          </router-link>
-          <router-link to="/index/user">
-            <el-menu-item index="5">
-              <i class="el-icon-user"></i>
-              <span slot="title">用户管理</span>
-            </el-menu-item>
-          </router-link>
-          <router-link to="/index/courseSort">
-            <el-menu-item index="6">
-              <i class="el-icon-s-operation"></i>
-              <span slot="title">分类管理</span>
-            </el-menu-item>
-          </router-link>
+          <div v-if="userInfo && userInfo[0].permission!='0'">
+            <router-link to="/index/course">
+              <el-menu-item index="2">
+                <i class="el-icon-mobile"></i>
+                <span slot="title">课程管理</span>
+              </el-menu-item>
+            </router-link>
+            <router-link to="/index/homework">
+              <el-menu-item index="3">
+                <i class="el-icon-document"></i>
+                <span slot="title">作业＆考试管理</span>
+              </el-menu-item>
+            </router-link>
+            <router-link to="/index/report">
+              <el-menu-item index="4">
+                <i class="el-icon-star-off"></i>
+                <span slot="title">评分统计</span>
+              </el-menu-item>
+            </router-link>
+            <div v-if="userInfo&&userInfo[0].permission=='2'">
+              <router-link to="/index/user">
+                <el-menu-item index="5">
+                  <i class="el-icon-user"></i>
+                  <span slot="title">用户统计</span>
+                </el-menu-item>
+              </router-link>
+              <router-link to="/index/courseSort">
+                <el-menu-item index="6">
+                  <i class="el-icon-s-operation"></i>
+                  <span slot="title">分类管理</span>
+                </el-menu-item>
+              </router-link>
+            </div>
+          </div>
         </el-menu>
       </el-col>
       <el-col class="index_article" :span="18">
@@ -58,7 +62,8 @@ export default {
   name: "index",
   data() {
     return {
-      isCollapse: false
+      isCollapse: false,
+      loading: false
     };
   },
   computed: {
@@ -69,8 +74,7 @@ export default {
       courseList: state => state.courseList,
       courseSortList: state => state.courseSortList
     })
-  },
-
+  }
 };
 </script>
 

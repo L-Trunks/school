@@ -44,7 +44,7 @@
         align="center"
         :width="operates.width"
         :fixed="operates.fixed"
-        v-if="operates.list.filter(_x=>_x.show === true).length > 0"
+        v-if="operates&&operates.list.filter(_x=>_x.show === true).length > 0"
       >
         <template slot-scope="scope">
           <div class="operate-group">

@@ -97,7 +97,7 @@ export class _mysql {
     }
     //根据分类查询课程列表
     selectAllCourseBySort(callback) {
-        this.connection.query('select c.*,u.user_name from s_course c,s_user u,s_course_sort s where c.teacher_id = u.id and c.sort_id = ?',
+        this.connection.query('select c.*,u.name from s_course c,s_user u where c.teacher_id = u.id and c.sort_id = ?',
             [this.getData.sortId], function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
@@ -105,7 +105,7 @@ export class _mysql {
     }
     //根据id查询课程信息
     selectAllCourseById(callback) {
-        this.connection.query('select c.*,u.user_name,s.sort_name from s_course c,s_user u,s_course_sort s where c.teacher_id = u.id and c.sort_id = s.id and c.id = ?',
+        this.connection.query('select c.*,u.name,s.sort_name from s_course c,s_user u,s_course_sort s where c.teacher_id = u.id and c.sort_id = s.id and c.id = ?',
             [this.getData.courseId], function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
@@ -113,7 +113,7 @@ export class _mysql {
     }
     //根据老师查询课程列表
     selectAllCourseByTea(callback) {
-        this.connection.query('select c.*,u.user_name,s.sort_name from s_course c,s_user u,s_course_sort s where c.teacher_id = ? and c.sort_id = s.id and c.id = ? and c.teacher_id = u.id',
+        this.connection.query('select c.*,u.name,s.sort_name from s_course c,s_user u,s_course_sort s where c.teacher_id = ? and c.sort_id = s.id and c.teacher_id = u.id',
             [this.getData.teacherId], function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
@@ -138,7 +138,7 @@ export class _mysql {
     //编辑课程
     updateCourse(callback) {
         this.connection.query('update s_course set course_name = ?,course_info = ?,course_url = ?,course_source_url = ?,course_source_name = ? where id = ?',
-            [this.getData.courseName, this.getData.courseInfo, this.getData.courseUrl, this.getData.courseSourceUrl, this.getData.courseSourceName,this.getData.courseId], function (err, rs, fields) {
+            [this.getData.courseName, this.getData.courseInfo, this.getData.courseUrl, this.getData.courseSourceUrl, this.getData.courseSourceName, this.getData.courseId], function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
             })
@@ -200,7 +200,7 @@ export class _mysql {
     //修改题目
     updateQuestion(callback) {
         this.connection.query('update s_question set question_article = ?,question_type = ?,question_answer = ?,is_question_answer = ?,question_error = ?,score = ? where id = ?',
-            [this.getData.questionArticle, this.getData.questionType, this.getData.questionAnswer, this.getData.isQuestionAnswer, this.getData.questionError, this.getData.score,this.getData.questionId],
+            [this.getData.questionArticle, this.getData.questionType, this.getData.questionAnswer, this.getData.isQuestionAnswer, this.getData.questionError, this.getData.score, this.getData.questionId],
             function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
@@ -261,7 +261,15 @@ export class _mysql {
     //根据课程查询试卷
     selectAllPaperByCourse(callback) {
         this.connection.query('select c.course_name,p.* from s_course c,s_paper p where p.course_id = c.id and p.course_id = ?',
-            [this.getData.teacherId], function (err, rs, fields) {
+            [this.getData.courseId], function (err, rs, fields) {
+                console.log(rs)
+                return callback(err, rs, fields)
+            })
+    }
+    //根据学生查询课程id
+    selectCourseIdByStudent(callback) {
+        this.connection.query('select * from s_students_course_map where student_id = ?',
+            [this.getData.studentId], function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
             })
@@ -276,8 +284,8 @@ export class _mysql {
     }
     //新增试卷
     addPaper(callback) {
-        this.connection.query('insert into s_paper (course_id,question_id,teacher_id,is_show,paper_type,end_time,paper_name) value (?,?,?,?,?,?,?)',
-            [this.getData.courseId, this.getData.questionIds, this.getData.teacherId, this.getData.isShow, this.getData.paperType, this.getData.endTime, this.getData.paperName],
+        this.connection.query('insert into s_paper (course_id,question_ids,teacher_id,is_show,paper_type,end_time,paper_name,paper_time) value (?,?,?,?,?,?,?,?)',
+            [this.getData.courseId, this.getData.questionIds, this.getData.teacherId, this.getData.isShow, this.getData.paperType, this.getData.endTime, this.getData.paperName, this.getData.paperTime],
             function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
@@ -285,8 +293,8 @@ export class _mysql {
     }
     //编辑试卷
     updatePaper(callback) {
-        this.connection.query('update s_paper question_id =?,is_show=?,paper_type=?,end_time=?,paper_name=? where id = ?',
-            [this.getData.questionId, this.getData.isShow, this.getData.paperType, this.getData.endTime, this.getData.paperName, this.getData.paperId], function (err, rs, fields) {
+        this.connection.query('update s_paper set question_ids =?,is_show=?,paper_type=?,end_time=?,paper_name=? where id = ?',
+            [this.getData.questionIds, this.getData.isShow, this.getData.paperType, this.getData.endTime, this.getData.paperName, this.getData.paperId], function (err, rs, fields) {
                 console.log(rs)
                 return callback(err, rs, fields)
             })
@@ -298,6 +306,13 @@ export class _mysql {
                 console.log(rs)
                 return callback(err, rs, fields)
             })
+    }
+    addReport(callback) {
+        this.connection.query('insert into s_school_report (report_level,student_id,paper_id,score_final,teacher_id) value(?,?,?,?,?)',
+        [this.getData.reportLevel,this.getData.studentId,this.getData.paperId,this.getData.scoreFinal,this.getData.teacherId], function (err, rs, fields) {
+            console.log(rs)
+            return callback(err, rs, fields)
+        })
     }
     //查询所有考试记录
     selectAllReport(callback) {
@@ -315,7 +330,7 @@ export class _mysql {
     }
     //根据试卷查询考试记录
     selectReportByPaper(callback) {
-        this.connection.query('select u.*,r.* from s_user u, s_school_report r where r.student_id = u.id and r.paper_id = ?', [this.getData.paperId], function (err, rs, fields) {
+        this.connection.query('select u.*,r.*,p.* from s_user u, s_school_report r,s_paper p where r.student_id = u.id and r.paper_id = p.id and r.paper_id = ?', [this.getData.paperId], function (err, rs, fields) {
             console.log(rs)
             return callback(err, rs, fields)
         })

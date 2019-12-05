@@ -1,6 +1,15 @@
 <template>
   <div>
-    <el-button type="success" size="mini" icon="el-icon-plus" @click="addDialog">新增</el-button>
+    <el-select size='mini' v-model="showCourseId" placeholder="请选择课程分类">
+      <el-option
+        v-for="item in sortOptions"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+        @change="getCourseList"
+      ></el-option>
+    </el-select>
+    <el-button style="margin-left:20px" type="success" size="mini" icon="el-icon-plus" @click="addDialog">新增</el-button>
     <factory-table
       :list="list"
       :options="options"
@@ -29,6 +38,7 @@
         <el-form-item label="课程封面">
           <el-upload
             class="upload-demo"
+            ref="upload"
             action="/api/upload"
             :show-file-list="true"
             :on-success="handleUploadSuccess"
@@ -42,6 +52,7 @@
         </el-form-item>
         <el-form-item label="课程资源">
           <el-upload
+            ref="uploads"
             class="upload-demo"
             action="/api/upload"
             :show-file-list="true"
@@ -80,7 +91,12 @@
 import DialogQuestion from "./DialogQuestion";
 import { mapState, mapMutations, mapActions } from "vuex";
 import FactoryTable from "./FactoryTable";
-import { AddCourse, UpdateCourse, DeleteCourse } from "../api/course_api";
+import {
+  AddCourse,
+  UpdateCourse,
+  DeleteCourse,
+  SelectAllCourseBySort
+} from "../api/course_api";
 export default {
   name: "course",
   data() {
@@ -90,6 +106,7 @@ export default {
       updateShowDialog: false,
       addShowDialog: false,
       courseId: null,
+      showCourseId: null,
       list: [], // table数据
       addCourseForm: {},
       updateCourseForm: {},
@@ -176,6 +193,16 @@ export default {
   },
   methods: {
     ...mapActions(["selectAllCourse"]),
+    getCourseList() {
+      SelectAllCourseBySort({ params: { sortId: this.showCourseId } }).then(
+        res => {
+          console.log(res);
+          if (res && res.data) {
+            this.list = res.data;
+          }
+        }
+      );
+    },
     //图片列表改变事件
     imgChange(f, fl) {
       console.log(fl);
@@ -206,6 +233,10 @@ export default {
     },
     handleshow(i, row) {
       console.log(row);
+      if (row.teacher_id != this.userId) {
+        this.$message.error("非本人发布课程不可编辑");
+        return;
+      }
       this.courseId = row.id;
       this.changeDialog(true);
     },
@@ -232,6 +263,8 @@ export default {
             this.selectAllCourse();
             this.$message.success("添加成功");
             this.addShowDialog = false;
+            this.$refs["upload"].clearFiles();
+            this.$refs["uploads"].clearFiles();
           } else {
             this.$message.error("出现错误");
           }
@@ -259,6 +292,10 @@ export default {
         });
     },
     handleEdit(index, row) {
+      if (row.teacher_id != this.userId) {
+        this.$message.error("非本人发布课程不可编辑");
+        return;
+      }
       //操作栏编辑按钮
       this.updateCourseForm = {
         courseName: row.course_name,
@@ -276,6 +313,10 @@ export default {
       //操作栏删除按钮
       console.log(" index:", index);
       console.log(" row:", row);
+      if (row.teacher_id != this.userId) {
+        this.$message.error("非本人发布课程不可编辑");
+        return;
+      }
       this.$confirm("删除后，该课程下所有的试卷，资源以及考试记录都会被删除？")
         .then(_ => {
           DeleteCourse({ params: { courseId: row.id } }).then(res => {
@@ -302,6 +343,9 @@ export default {
     },
     courseSortList: function() {
       this.setOptions();
+    },
+    showCourseId:function(){
+      this.getCourseList()
     }
   },
   components: {

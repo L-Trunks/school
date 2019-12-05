@@ -391,13 +391,13 @@ export default {
                 });
               break;
           }
-        }else {
+        } else {
           return false;
         }
       });
     },
     //注册
-    register() {
+    register(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           switch (this.registerValue) {
@@ -406,7 +406,7 @@ export default {
                 .then(res => {
                   console.log(res);
                   if (res.data && res.data.insertId) {
-                    this.selectUserById(res.data.insertId);
+                    this.selectUserById({ userId: res.data.insertId });
                     this.changeUserId(res.data.insertId);
                     this.changeLoginState(true);
                     this.$message.success("注册成功,已自动登录");
@@ -430,7 +430,7 @@ export default {
                 .then(res => {
                   console.log(res);
                   if (res.data && res.data.insertId) {
-                    this.selectUserById(res.data.insertId);
+                    this.selectUserById({ userId: res.data.insertId });
                     this.changeUserId(res.data.insertId);
                     this.changeLoginState(true);
                     this.selectAllCourse();
@@ -454,7 +454,7 @@ export default {
                 .then(res => {
                   console.log(res);
                   if (res.data && res.data.insertId) {
-                    this.selectUserById(res.data.insertId);
+                    this.selectUserById({ userId: res.data.insertId });
                     this.changeUserId(res.data.insertId);
                     this.changeLoginState(true);
                     this.selectAllCourse();
@@ -472,7 +472,7 @@ export default {
                 });
               break;
           }
-        }else {
+        } else {
           return false;
         }
       });
