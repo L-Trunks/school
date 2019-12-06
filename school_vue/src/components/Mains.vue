@@ -383,10 +383,12 @@ export default {
     this.setOptions();
     this.getUserCourse();
     this.getReportList();
+    this.getCourseInfo();
   },
   mounted() {
-    this.sortId = this.sortOptions[0] && this.sortOptions[0].value || "";
-    this.getCourseInfo();
+    this.sortId = (this.sortOptions[0] && this.sortOptions[0].value) || "";
+
+    this.checkUserPaperList();
   },
   methods: {
     ...mapActions(["selectUserById", "selectAllCourse", "selectAllSort"]),
@@ -540,6 +542,19 @@ export default {
             }
           );
         });
+      this.checkUserPaperList();
+    },
+    checkUserPaperList() {
+      this.userPaperList &&
+        this.userPaperList.map((k, j) => {
+          this.userReportList &&
+            this.userReportList.map((v, i) => {
+              if (k.id == v.paper_id) {
+                this.userPaperList.splice(j, 1);
+              }
+            });
+        });
+      console.log(this.userPaperList);
     },
     setOptions() {
       this.sortOptions = [];
@@ -621,6 +636,12 @@ export default {
     },
     userCourseList: function() {
       this.getCourseInfo();
+    },
+    userReportList: function() {
+      this.checkUserPaperList();
+    },
+    userPaperList: function() {
+      this.checkUserPaperList();
     }
   },
   computed: {
